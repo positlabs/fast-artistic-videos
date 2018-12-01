@@ -22,13 +22,12 @@ fi
 filename=$(basename "$1")
 extension="${filename##*.}"
 filename="${filename%.*}"
-filename=${filename//[%]/x}
+filename=/io/${filename//[%]/x}
 model_vid_path=$2
 model_img_path=${3:-self}
 
 # Create output folder
 mkdir -p $filename
-
 
 echo ""
 read -p "In case of multiple GPUs, enter the zero-indexed ID of the GPU to use here, or enter -1 for CPU mode (slow!).\
@@ -78,10 +77,10 @@ fi
 echo ""
 echo "Starting optical flow computation..."
 # This launches optical flow computation
-bash makeOptFlow_flownet.sh ./${filename}/frame_%05d.ppm ./${filename}/flow_$resolution 1
+bash makeOptFlow_flownet.sh ${filename}/frame_%05d.ppm ${filename}/flow_$resolution 1
 echo "Starting occlusion estimator as a background task..."
 # Hack: Just run makeOptFlow.sh, this will skip flow computation since flow files are already present
-nice bash makeOptFlow_deepflow.sh ./${filename}/frame_%05d.ppm ./${filename}/flow_$resolution 1 &
+nice bash makeOptFlow_deepflow.sh ${filename}/frame_%05d.ppm ${filename}/flow_$resolution 1 &
 
 echo "Starting video stylization..."
 # Perform style transfer
@@ -95,7 +94,6 @@ th fast_artistic_video.lua \
 -gpu $gpu \
 -model_vid $model_vid_path \
 -model_img $model_img_path
-
 
 # Create video from output images.
 $FFMPEG -i ${filename}/out-%05d.png ${filename}-stylized.$extension

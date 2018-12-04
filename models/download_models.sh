@@ -1,6 +1,6 @@
 cd models
 
-ROOT_URL=https://lmb.informatik.uni-freiburg.de/data/fast-artistic-videos/models
+ROOT_URL=${1:-"https://lmb.informatik.uni-freiburg.de/data/fast-artistic-videos/models"}
 
 # Video models
 wget $ROOT_URL/checkpoint-mosaic-video.t7
